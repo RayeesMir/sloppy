@@ -1,0 +1,5 @@
+.dev.sh
+Dockerfile
+docker-compose.yml
+node_modules
+db
