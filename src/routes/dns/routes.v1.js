@@ -9,7 +9,6 @@ router.route('/check/:hostname')
     const hostname = req.params.hostname;
     DNS.check(hostname)
       .then((result) => {
-        console.log(result)
         res.json({
           status: 'success',
           data: result,
