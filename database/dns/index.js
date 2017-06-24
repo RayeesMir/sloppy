@@ -11,8 +11,8 @@ module.exports = {
 	_id: '_design/dns',
 	language: 'javascript',
 	views: {
-		'hostname': {
-			map:readFile('/by-hostname.js')
+		'by-timestamp': {
+			map:readFile('/by-timestamp.js')
 		},
 	},
 }

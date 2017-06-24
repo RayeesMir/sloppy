@@ -26,10 +26,10 @@
   },
   "scripts": {
     "start": "nodemon src/app.js --exec babel-node",
-    "test": "DEBUG=nano* NODE_ENV=test mocha"
+    "test": "eslint src/ && DEBUG=nano* NODE_ENV=test mocha"
   },
   "license": "ISC",
   "config": {
-    "couchdburl": "http://localhost:5984"
+    "couchdburl": "http://db:5984"
   }
 }

@@ -33,9 +33,9 @@ function createDesignDoc(db, doc) {
   })
 }
 
-function insertDocument(db, doc, name) {
+function insertDocument(db, doc) {
   return new Promise((resolve, reject) => {
-    db.insert(doc, name, (error, result) => {
+    db.insert(doc, (error, result) => {
       if (error) {
         reject(error)
       } else {
@@ -57,29 +57,7 @@ function lookup(host) {
   })
 }
 
-function getDocument(db, name, query) {
-  return new Promise((resolve, reject) => {
-    db.get(name, query, (error, data) => {
-      if (error) {
-        if (error.statusCode === 404) {
-          resolve();
-        } else {
-          reject();
-        }
-      } else {
-        resolve(data)
-      }
-    })
-  })
-}
 export function check(hostname) {
-  /**
-  1.Check Method resolves hostname and matches it will `lb.sloppy.io` IP
-  it uses lookup twice becoz it checks `lb.sloppy.io` as well 
-  instead of constant(IP address) of `lb.sloppy.io`.IP address of `lb.sloppy.io` can changes at any point of time   
-  2.Check can also do lookup in parrllel as well insted of "Promise.All"
-  3.we can also check entry of domain locally first
-  **/
   const doc = {
     domain: hostname,
     timestamp: new Date().getTime(),
@@ -96,18 +74,9 @@ export function check(hostname) {
         } else {
           doc.match = false;
         }
-        return getDocument(lookupsDB, hostname, {});
-      })
-      .then((result) => {
-        const res = result;
-        if (result) {
-          res.match = doc.match;
-          return insertDocument(lookupsDB, res, res.domain);
-        }
-        return insertDocument(lookupsDB, doc, doc.domain);
+        return insertDocument(lookupsDB, doc);
       })
       .then(() => {
-        delete doc.timestamp;
         resolve(doc);
       })
       .catch(() => {
@@ -117,7 +86,7 @@ export function check(hostname) {
 }
 export function list() {
   return new Promise((resolve, reject) => {
-    lookupsDB.view('dns', 'hostname', {}, (error, result) => {
+    lookupsDB.view('dns', 'by-timestamp', {}, (error, result) => {
       if (error) {
         reject(error)
       }
@@ -125,10 +94,12 @@ export function list() {
         const {
           domain,
           match,
+          timestamp,
         } = row.value
         return {
           domain,
           match,
+          timestamp,
         }
       }))
     })
